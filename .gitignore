@@ -3,4 +3,4 @@ example/keys
 *.tfstate
 *.tfstate*
 *.swp
-*~
+.idea*

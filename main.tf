@@ -1,7 +1,7 @@
 /**
  * The stack module combines sub modules to create a complete
  * stack with `vpc`, a default ecs cluster with auto scaling
- * and a bastion node that enables you to access all instances.
+ * Also installs the SSM agent rather than a bastion
  *
  * Usage:
  *
@@ -37,7 +37,7 @@ variable "domain_name_servers" {
 
 variable "region" {
   description = "the AWS region in which resources are created, you must set the availability_zones variable as well if you define this value to something other than the default"
-  default     = "us-west-2"
+  default     = "us-east-1"
 }
 
 variable "cidr" {
@@ -57,12 +57,7 @@ variable "external_subnets" {
 
 variable "availability_zones" {
   description = "a comma-separated list of availability zones, defaults to all AZ of the region, if set to something other than the defaults, both internal_subnets and external_subnets have to be defined as well"
-  default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
-}
-
-variable "bastion_instance_type" {
-  description = "Instance type for the bastion"
-  default = "t2.micro"
+  default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 
 variable "ecs_cluster_name" {
@@ -91,7 +86,7 @@ variable "ecs_min_size" {
 
 variable "ecs_max_size" {
   description = "the maximum number of instances to use in the default ecs cluster"
-  default     = 100
+  default     = 10
 }
 
 variable "ecs_desired_capacity" {
@@ -120,7 +115,7 @@ variable "ecs_docker_auth_data" {
 }
 
 variable "ecs_security_groups" {
-  description = "A comma separated list of security groups from which ingest traffic will be allowed on the ECS cluster, it defaults to allowing ingress traffic on port 22 and coming grom the ELBs"
+  description = "A comma separated list of security groups from which ingest traffic will be allowed on the ECS cluster, it defaults to allowing ingress traffic on port 22 and coming from the ELBs"
   default     = ""
 }
 
@@ -171,16 +166,6 @@ module "security_groups" {
   cidr        = "${var.cidr}"
 }
 
-module "bastion" {
-  source          = "./bastion"
-  region          = "${var.region}"
-  instance_type   = "${var.bastion_instance_type}"
-  security_groups = "${module.security_groups.external_ssh},${module.security_groups.internal_ssh}"
-  vpc_id          = "${module.vpc.id}"
-  subnet_id       = "${element(module.vpc.external_subnets, 0)}"
-  key_name        = "${var.key_name}"
-  environment     = "${var.environment}"
-}
 
 module "dhcp" {
   source  = "./dhcp"
@@ -238,11 +223,6 @@ module "s3_logs" {
 // The region in which the infra lives.
 output "region" {
   value = "${var.region}"
-}
-
-// The bastion host IP.
-output "bastion_ip" {
-  value = "${module.bastion.external_ip}"
 }
 
 // The internal route53 zone ID.
