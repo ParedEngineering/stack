@@ -14,5 +14,6 @@ bootcmd:
 
 
 runcmd:
-  - [ yum, install, -y, "https://amazon-ssm-${region}.s3.amazonaws.com/latest/linux_amd64/amazon-ssm-agent.rpm"]
+  - sudo yum install -y "https://amazon-ssm-${region}.s3.amazonaws.com/latest/linux_amd64/amazon-ssm-agent.rpm"
+  - sudo start amazon-ssm-agent
 
