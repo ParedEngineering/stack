@@ -36,7 +36,6 @@ variable "version" {
 }
 
 variable "subnet_ids" {
-  type = "list"
   description = "Comma separated list of subnet IDs that will be passed to the ELB module"
 }
 
