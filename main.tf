@@ -67,7 +67,7 @@ variable "ecs_cluster_name" {
 
 variable "ecs_instance_type" {
   description = "the instance type to use for your default ecs cluster"
-  default     = "m4.large"
+  default     = "m5.large"
 }
 
 variable "ecs_instance_ebs_optimized" {

@@ -22,12 +22,10 @@ variable "cidr" {
   description = "The CIDR block to provision for the VPC"
 }
 
+# if we want other regions available, we must pack them ourselves
 variable "default_ecs_ami" {
   default = {
-    us-east-1 = "ami-5e414e24"
-    us-east-2 = "ami-67ab9e02"
-    us-west-1 = "ami-00898660"
-    us-west-2 = "ami-10ed6968"
+    us-east-1 = "ami-34352d4e"
   }
 }
 

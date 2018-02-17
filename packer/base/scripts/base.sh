@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+export DEBIAN_FRONTEND=noninteractive
 systemctl disable apt-daily.service
 systemctl disable apt-daily.timer
 
@@ -35,6 +36,10 @@ apt-get install -y \
         ntp \
         logrotate \
         dhcping \
+        nfs-common \
+        curl \
+        unzip \
+        jq \
         dhcpdump
 
 pip install awscli
