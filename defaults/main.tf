@@ -25,7 +25,7 @@ variable "cidr" {
 # if we want other regions available, we must pack them ourselves
 variable "default_ecs_ami" {
   default = {
-    us-east-1 = "ami-34352d4e"
+    us-east-1 = "ami-4e253d34"
   }
 }
 
