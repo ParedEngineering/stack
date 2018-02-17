@@ -96,7 +96,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "ssm_ecs_instance_role_policy" {
-  name = "ecs-instance-role-policy-${var.name}-${var.environment}"
+  name = "ecs-ssm-role-policy-${var.name}-${var.environment}"
   role = "${aws_iam_role.default_ecs_role.id}"
 
   policy = <<EOF
