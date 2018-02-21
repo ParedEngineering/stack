@@ -63,6 +63,10 @@ variable "iam_role" {
   description = "IAM Role ARN to use"
 }
 
+variable "iam_task_role" {
+  description = "IAM Role ARN for tasks to use"
+}
+
 variable "external_dns_name" {
   description = "The subdomain under which the ELB is exposed externally, defaults to the task name"
   default     = ""
@@ -164,6 +168,7 @@ module "task" {
   env_vars      = "${var.env_vars}"
   memory        = "${var.memory}"
   cpu           = "${var.cpu}"
+  role          = "${var.iam_task_role}"
 
   ports = <<EOF
   [
