@@ -1,6 +1,7 @@
 ---
 # https://www.packer.io/docs/builders/amazon-ebs.html
 #     us-east-1 = "ami-0b383171"
+# https://cloud-images.ubuntu.com/locator/ec2/
 
 ami:
   source_ami: ami-0b383171
@@ -15,5 +16,6 @@ scripts:
   - ixgbevf.sh
   - bootstrap.sh
   - docker.sh
+  - ssm.sh
 
 execute: "echo ubuntu | {{ .Vars }} sudo -E -S sh '{{ .Path }}'"

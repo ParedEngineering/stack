@@ -12,6 +12,7 @@ apt-cache policy docker-engine
 
 
 apt-get install -o Dpkg::Options::="--force-confold" -y \
+        linux-image-extra-virtual \
         docker-engine
 #         linux-image-extra-$(uname -r) \
 

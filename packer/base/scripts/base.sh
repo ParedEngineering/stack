@@ -2,6 +2,7 @@
 set -e
 
 export DEBIAN_FRONTEND=noninteractive
+# This doesnt' truly disable apt-daily on boot, solution at bottom necessary
 systemctl disable apt-daily.service
 systemctl disable apt-daily.timer
 
@@ -45,3 +46,9 @@ apt-get install -y \
 pip install awscli
 
 apt-get dist-upgrade -y
+
+# We are failing to execute dpkg due to periodic updates of apt
+# Issue referenced here https://bugs.launchpad.net/cloud-init/+bug/1693361
+cat <<EOF >/etc/apt/apt.conf.d/10disable-periodic
+APT::Periodic::Enable "0";
+EOF
