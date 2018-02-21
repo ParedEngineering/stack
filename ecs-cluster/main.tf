@@ -171,7 +171,7 @@ data "template_file" "ecs_cloud_config" {
     name             = "${var.name}"
     region           = "${var.region}"
     docker_auth_type = "${var.docker_auth_type}"
-    docker_auth_data = "${var.docker_auth_data}"
+    docker_auth_data = "${trimspace(chomp(var.docker_auth_data))}"
   }
 }
 
