@@ -54,6 +54,7 @@ variable "ports" {
 
 variable "image_version" {
   description = "The docker image version"
+  default = "latest"
 }
 
 variable "memory" {

@@ -30,8 +30,9 @@ variable "name" {
   default     = ""
 }
 
-variable "version" {
+variable "image_version" {
   description = "The docker image version"
+  default = "latest"
 }
 
 variable "subnet_ids" {
@@ -162,7 +163,7 @@ module "task" {
 
   name          = "${coalesce(var.name, replace(var.image, "/", "-"))}"
   image         = "${var.image}"
-  image_version = "${var.version}"
+  image_version = "${var.image_version}"
   command       = "${var.command}"
   env_vars      = "${var.env_vars}"
   memory        = "${var.memory}"
