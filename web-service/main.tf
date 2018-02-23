@@ -32,7 +32,7 @@ variable "name" {
 
 variable "image_version" {
   description = "The docker image version"
-  default = "latest"
+  default     = "latest"
 }
 
 variable "subnet_ids" {
