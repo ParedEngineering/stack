@@ -84,7 +84,7 @@ resource "aws_eks_cluster" "main" {
   role_arn = "${var.cluster_role_arn}"
 
   vpc_config {
-    security_group_ids = "${var.security_groups}"
+    security_group_ids = ["${var.security_groups}"]
     subnet_ids      = ["${var.subnet_ids}"]
   }
 }
