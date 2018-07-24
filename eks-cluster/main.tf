@@ -25,7 +25,7 @@ variable "image_id" {
 
 variable "security_groups" {
   description = "Comma separated list of security groups"
-  type = "list"
+  type        = "list"
 }
 
 variable "node_security_group_id" {
@@ -85,7 +85,7 @@ resource "aws_eks_cluster" "main" {
 
   vpc_config {
     security_group_ids = ["${var.security_groups}"]
-    subnet_ids      = ["${var.subnet_ids}"]
+    subnet_ids         = ["${var.subnet_ids}"]
   }
 }
 
