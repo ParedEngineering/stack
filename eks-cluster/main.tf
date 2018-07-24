@@ -90,7 +90,7 @@ resource "aws_eks_cluster" "main" {
 }
 
 data "template_file" "eks_cloud_config" {
-  template = "${file("${path.module}/files/cloud-config.yml.tpl")}"
+  template = "${file("${path.module}/files/userdata.tpl")}"
 
   vars {
     environment                   = "${var.environment}"
@@ -102,16 +102,6 @@ data "template_file" "eks_cloud_config" {
   }
 }
 
-data "template_cloudinit_config" "cloud_config" {
-  gzip          = false
-  base64_encode = false
-
-  part {
-    content_type = "text/cloud-config"
-    content      = "${data.template_file.eks_cloud_config.rendered}"
-  }
-}
-
 resource "aws_launch_configuration" "main" {
   name_prefix = "${format("%s-", var.name)}"
 
@@ -120,7 +110,7 @@ resource "aws_launch_configuration" "main" {
   ebs_optimized               = "${var.instance_ebs_optimized}"
   iam_instance_profile        = "${var.iam_instance_profile}"
   security_groups             = ["${var.node_security_group_id}"]
-  user_data                   = "${data.template_cloudinit_config.cloud_config.rendered}"
+  user_data                   = "${data.template_file.eks_cloud_config.rendered}"
   associate_public_ip_address = "${var.associate_public_ip_address}"
   key_name                    = "${var.key_name}"
 
