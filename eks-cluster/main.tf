@@ -71,7 +71,7 @@ variable "desired_capacity" {
 
 variable "associate_public_ip_address" {
   description = "Should created instances be publicly accessible (if the SG allows)"
-  default     = false
+  default     = true
 }
 
 variable "root_volume_size" {

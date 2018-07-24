@@ -81,6 +81,15 @@ resource "aws_security_group_rule" "node_to_cluster_ingress" {
   description              = "Allows pods to communicate with the cluster API server"
 }
 
+resource "aws_security_group_rule" "ssh_to_node_ingress" {
+  from_port                = 22
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.node.id}"
+  to_port                  = 22
+  type                     = "ingress"
+  description              = "Allows developers to SSH into nodes"
+}
+
 output "node" {
   value = "${aws_security_group.node.id}"
 }
