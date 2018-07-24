@@ -26,6 +26,10 @@ variable "name" {
   default     = "stack"
 }
 
+variable "cluster_name" {
+  description = "The name given to the EKS cluster"
+}
+
 variable "use_nat_instances" {
   description = "If true, use EC2 NAT instances instead of the AWS NAT gateway service."
   default     = false
@@ -73,6 +77,7 @@ resource "aws_vpc" "main" {
   tags {
     Name        = "${var.name}"
     Environment = "${var.environment}"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
@@ -106,78 +111,6 @@ resource "aws_eip" "nat" {
   vpc = true
 }
 
-resource "aws_security_group" "nat_instances" {
-  # Create this only if using NAT instances, vs. the NAT gateway service.
-  count       = "${0 + var.use_nat_instances}"
-  name        = "nat"
-  description = "Allow traffic from clients into NAT instances"
-
-  ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "udp"
-    cidr_blocks = "${var.internal_subnets}"
-  }
-
-  ingress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = "${var.internal_subnets}"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  vpc_id = "${aws_vpc.main.id}"
-}
-
-resource "aws_instance" "nat_instance" {
-  # Create these only if using NAT instances, vs. the NAT gateway service.
-  count             = "${(0 + var.use_nat_instances) * length(var.internal_subnets)}"
-  availability_zone = "${element(var.availability_zones, count.index)}"
-
-  tags {
-    Name        = "${var.name}-${format("internal-%03d NAT", count.index+1)}"
-    Environment = "${var.environment}"
-  }
-
-  volume_tags {
-    Name        = "${var.name}-${format("internal-%03d NAT", count.index+1)}"
-    Environment = "${var.environment}"
-  }
-
-  key_name          = "${var.nat_instance_ssh_key_name}"
-  ami               = "${data.aws_ami.nat_ami.id}"
-  instance_type     = "${var.nat_instance_type}"
-  source_dest_check = false
-
-  # associate_public_ip_address is not used,,
-  # as public subnets have map_public_ip_on_launch set to true.
-  # Also, using associate_public_ip_address causes issues with
-  # stopped NAT instances which do not use an Elastic IP.
-  # - For more details: https://github.com/terraform-providers/terraform-provider-aws/issues/343
-  subnet_id = "${element(aws_subnet.external.*.id, count.index)}"
-
-  vpc_security_group_ids = ["${aws_security_group.nat_instances.id}"]
-
-  lifecycle {
-    # Ignore changes to the NAT AMI data source.
-    ignore_changes = ["ami"]
-  }
-}
-
-resource "aws_eip_association" "nat_instance_eip" {
-  # Create these only if using NAT instances, vs. the NAT gateway service.
-  count         = "${(0 + (var.use_nat_instances * var.use_eip_with_nat_instances)) * length(var.internal_subnets)}"
-  instance_id   = "${element(aws_instance.nat_instance.*.id, count.index)}"
-  allocation_id = "${element(aws_eip.nat.*.id, count.index)}"
-}
-
 /**
  * Subnets.
  */
@@ -191,6 +124,7 @@ resource "aws_subnet" "internal" {
   tags {
     Name        = "${var.name}-${format("internal-%03d", count.index+1)}"
     Environment = "${var.environment}"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
@@ -204,6 +138,7 @@ resource "aws_subnet" "external" {
   tags {
     Name        = "${var.name}-${format("external-%03d", count.index+1)}"
     Environment = "${var.environment}"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
 
@@ -244,12 +179,6 @@ resource "aws_route" "internal" {
   nat_gateway_id         = "${element(aws_nat_gateway.main.*.id, count.index)}"
 }
 
-resource "aws_route" "internal_nat_instance" {
-  count                  = "${(0 + var.use_nat_instances) * length(compact(var.internal_subnets))}"
-  route_table_id         = "${element(aws_route_table.internal.*.id, count.index)}"
-  destination_cidr_block = "0.0.0.0/0"
-  instance_id            = "${element(aws_instance.nat_instance.*.id, count.index)}"
-}
 
 /**
  * Route associations
