@@ -126,7 +126,7 @@ resource "aws_launch_configuration" "main" {
 }
 
 resource "aws_autoscaling_group" "main" {
-  name = "${var.name}"
+  name_prefix = "${var.name}"
 
   availability_zones   = ["${var.availability_zones}"]
   vpc_zone_identifier  = ["${var.subnet_ids}"]
