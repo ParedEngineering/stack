@@ -23,10 +23,11 @@ variable "cidr" {
 }
 
 # if we want other regions available, we must pack them ourselves
-variable "default_ecs_ami" {
+variable "default_eks_ami" {
   default = {
-    us-east-1 = "ami-1a03e267"
+    us-west-2 = "ami-73a6e20b"
   }
+  type = "map"
 }
 
 # http://docs.aws.amazon.com/ElasticLoadBalancing/latest/DeveloperGuide/enable-access-logs.html#attach-bucket-policy
@@ -37,14 +38,15 @@ variable "default_log_account_ids" {
     us-west-1 = "027434742980"
     us-west-2 = "797873946194"
   }
+  type = "map"
 }
 
 output "domain_name_servers" {
   value = "${cidrhost(var.cidr, 2)}"
 }
 
-output "ecs_ami" {
-  value = "${lookup(var.default_ecs_ami, var.region)}"
+output "eks_ami" {
+  value = "${lookup(var.default_eks_ami, var.region)}"
 }
 
 output "s3_logs_account_id" {
