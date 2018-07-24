@@ -48,19 +48,19 @@ variable "cidr" {
 variable "internal_subnets" {
   description = "a list of CIDRs for internal subnets in your VPC, must be set if the cidr variable is defined, needs to have as many elements as there are availability zones"
   default     = ["10.30.0.0/19", "10.30.64.0/19", "10.30.128.0/19"]
-  type = "list"
+  type        = "list"
 }
 
 variable "external_subnets" {
   description = "a list of CIDRs for external subnets in your VPC, must be set if the cidr variable is defined, needs to have as many elements as there are availability zones"
   default     = ["10.30.32.0/20", "10.30.96.0/20", "10.30.160.0/20"]
-  type = "list"
+  type        = "list"
 }
 
 variable "availability_zones" {
   description = "a comma-separated list of availability zones, defaults to all AZ of the region, if set to something other than the defaults, both internal_subnets and external_subnets have to be defined as well"
   default     = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  type = "list"
+  type        = "list"
 }
 
 variable "eks_cluster_name" {
@@ -134,7 +134,7 @@ module "vpc" {
   external_subnets   = "${var.external_subnets}"
   availability_zones = "${var.availability_zones}"
   environment        = "${var.environment}"
-  cluster_name = "${coalesce(var.eks_cluster_name, var.name)}"
+  cluster_name       = "${coalesce(var.eks_cluster_name, var.name)}"
 }
 
 module "security_groups" {
@@ -146,26 +146,13 @@ module "security_groups" {
 }
 
 module "security_groups_node" {
-  source      = "./security-groups-node"
-  name        = "${var.name}"
-  vpc_id      = "${module.vpc.id}"
-  environment = "${var.environment}"
-  cidr        = "${var.cidr}"
+  source                    = "./security-groups-node"
+  name                      = "${var.name}"
+  vpc_id                    = "${module.vpc.id}"
+  environment               = "${var.environment}"
+  cidr                      = "${var.cidr}"
   cluster_security_group_id = "${module.security_groups.cluster}"
-  cluster_name = "${coalesce(var.eks_cluster_name, var.name)}"
-}
-
-module "dhcp" {
-  source  = "./dhcp"
-  name    = "${module.dns.name}"
-  vpc_id  = "${module.vpc.id}"
-  servers = "${coalesce(var.domain_name_servers, module.defaults.domain_name_servers)}"
-}
-
-module "dns" {
-  source = "./dns"
-  name   = "${var.domain_name}"
-  vpc_id = "${module.vpc.id}"
+  cluster_name              = "${coalesce(var.eks_cluster_name, var.name)}"
 }
 
 module "iam_role_cluster" {
@@ -181,23 +168,23 @@ module "iam_role_node" {
 }
 
 module "eks_cluster" {
-  source                     = "./eks-cluster"
-  cluster_role_arn = "${module.iam_role_cluster.arn}"
-  name                       = "${coalesce(var.eks_cluster_name, var.name)}"
-  environment                = "${var.environment}"
-  image_id                   = "${coalesce(var.eks_ami, module.defaults.eks_ami)}"
-  subnet_ids                 = "${module.vpc.internal_subnets}"
-  key_name                   = "${var.key_name}"
-  instance_type              = "${var.eks_instance_type}"
-  instance_ebs_optimized     = "${var.eks_instance_ebs_optimized}"
-  iam_instance_profile       = "${module.iam_role_node.profile}"
-  min_size                   = "${var.eks_min_size}"
-  max_size                   = "${var.eks_max_size}"
-  desired_capacity           = "${var.eks_desired_capacity}"
-  region                     = "${var.region}"
-  availability_zones         = "${module.vpc.availability_zones}"
-  root_volume_size           = "${var.eks_root_volume_size}"
-  security_groups            = "${coalesce(var.eks_security_groups, format("%s", module.security_groups.cluster))}"
+  source                 = "./eks-cluster"
+  cluster_role_arn       = "${module.iam_role_cluster.arn}"
+  name                   = "${coalesce(var.eks_cluster_name, var.name)}"
+  environment            = "${var.environment}"
+  image_id               = "${coalesce(var.eks_ami, module.defaults.eks_ami)}"
+  subnet_ids             = "${module.vpc.internal_subnets}"
+  key_name               = "${var.key_name}"
+  instance_type          = "${var.eks_instance_type}"
+  instance_ebs_optimized = "${var.eks_instance_ebs_optimized}"
+  iam_instance_profile   = "${module.iam_role_node.profile}"
+  min_size               = "${var.eks_min_size}"
+  max_size               = "${var.eks_max_size}"
+  desired_capacity       = "${var.eks_desired_capacity}"
+  region                 = "${var.region}"
+  availability_zones     = "${module.vpc.availability_zones}"
+  root_volume_size       = "${var.eks_root_volume_size}"
+  security_groups        = ["${module.security_groups.cluster}"]
   node_security_group_id = "${module.security_groups_node.node}"
 }
 
@@ -214,12 +201,6 @@ module "s3_logs" {
 output "region" {
   value = "${var.region}"
 }
-
-// The internal route53 zone ID.
-output "zone_id" {
-  value = "${module.dns.zone_id}"
-}
-
 
 // Comma separated list of internal subnet IDs.
 output "internal_subnets" {
@@ -244,11 +225,6 @@ output "iam_role_default_eks_role_id" {
 // S3 bucket ID for ELB logs.
 output "log_bucket_id" {
   value = "${module.s3_logs.id}"
-}
-
-// The internal domain name, e.g "stack.local".
-output "domain_name" {
-  value = "${module.dns.name}"
 }
 
 // The environment of the stack, e.g "prod".

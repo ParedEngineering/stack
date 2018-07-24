@@ -18,7 +18,6 @@ variable "cidr" {
   description = "The cidr block to use for internal security groups"
 }
 
-
 resource "aws_security_group" "cluster" {
   name        = "${format("%s-%s-cluster", var.name, var.environment)}"
   vpc_id      = "${var.vpc_id}"
@@ -42,17 +41,15 @@ resource "aws_security_group" "cluster" {
 }
 
 resource "aws_security_group_rule" "local_to_cluster_ingress" {
-  cidr_blocks = ["136.25.190.72/32"]
-  from_port = 443
-  protocol = "tcp"
+  cidr_blocks       = ["136.25.190.72/32"]
+  from_port         = 443
+  protocol          = "tcp"
   security_group_id = "${aws_security_group.cluster.id}"
-  to_port = 443
-  type = "ingress"
-  description = "Allows local machine to communicate with cluster API"
+  to_port           = 443
+  type              = "ingress"
+  description       = "Allows local machine to communicate with cluster API"
 }
-
 
 output "cluster" {
   value = "${aws_security_group.cluster.id}"
 }
-

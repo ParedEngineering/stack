@@ -6,7 +6,6 @@ variable "environment" {
   description = "The name of the environment for this stack"
 }
 
-
 resource "aws_iam_role" "default_eks_node_role" {
   name = "eks-role-node-${var.name}-${var.environment}"
 

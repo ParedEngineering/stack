@@ -6,7 +6,6 @@ variable "environment" {
   description = "The name of the environment for this stack"
 }
 
-
 resource "aws_iam_role" "default_eks_cluster_role" {
   name = "eks-role-cluster-${var.name}-${var.environment}"
 
@@ -32,7 +31,6 @@ EOF
 
 data "aws_iam_policy_document" "default_eks_service_role_policy_document" {
   statement {
-
     actions = [
       "ec2:CreateNetworkInterface",
       "ec2:CreateNetworkInterfacePermission",
@@ -47,20 +45,19 @@ data "aws_iam_policy_document" "default_eks_service_role_policy_document" {
     ]
 
     resources = [
-      "*"
+      "*",
     ]
   }
 
   statement {
-
     actions = [
       "ec2:CreateTags",
-      "ec2:DeleteTags"
+      "ec2:DeleteTags",
     ]
 
     resources = [
       "arn:aws:ec2:*:*:vpc/*",
-      "arn:aws:ec2:*:*:subnet/*"
+      "arn:aws:ec2:*:*:subnet/*",
     ]
   }
 }
@@ -74,7 +71,6 @@ resource "aws_iam_role_policy" "default_eks_service_role_policy" {
 
 data "aws_iam_policy_document" "default_eks_cluster_policy_document" {
   statement {
-
     actions = [
       "autoscaling:DescribeAutoScalingGroups",
       "autoscaling:UpdateAutoScalingGroup",
@@ -129,11 +125,11 @@ data "aws_iam_policy_document" "default_eks_cluster_policy_document" {
       "elasticloadbalancing:RegisterTargets",
       "elasticloadbalancing:SetLoadBalancerPoliciesForBackendServer",
       "elasticloadbalancing:SetLoadBalancerPoliciesOfListener",
-      "kms:DescribeKey"
+      "kms:DescribeKey",
     ]
 
     resources = [
-      "*"
+      "*",
     ]
   }
 
@@ -142,23 +138,20 @@ data "aws_iam_policy_document" "default_eks_cluster_policy_document" {
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
-      "logs:DescribeLogStreams"
+      "logs:DescribeLogStreams",
     ]
 
     resources = [
-      "arn:aws:logs:*:*:*"
+      "arn:aws:logs:*:*:*",
     ]
   }
 }
 
-
 resource "aws_iam_role_policy" "default_eks_cluster_policy" {
-  name = "ecs-instance-role-policy-${var.name}-${var.environment}"
-  role = "${aws_iam_role.default_eks_cluster_role.id}"
+  name   = "ecs-instance-role-policy-${var.name}-${var.environment}"
+  role   = "${aws_iam_role.default_eks_cluster_role.id}"
   policy = "${data.aws_iam_policy_document.default_eks_cluster_policy_document.json}"
 }
-
-
 
 output "default_eks_cluster_role_id" {
   value = "${aws_iam_role.default_eks_cluster_role.id}"

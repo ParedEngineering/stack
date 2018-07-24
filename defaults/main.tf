@@ -27,6 +27,7 @@ variable "default_eks_ami" {
   default = {
     us-west-2 = "ami-73a6e20b"
   }
+
   type = "map"
 }
 
@@ -38,6 +39,7 @@ variable "default_log_account_ids" {
     us-west-1 = "027434742980"
     us-west-2 = "797873946194"
   }
+
   type = "map"
 }
 

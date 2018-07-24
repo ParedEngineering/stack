@@ -75,8 +75,8 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
 
   tags {
-    Name        = "${var.name}"
-    Environment = "${var.environment}"
+    Name                                        = "${var.name}"
+    Environment                                 = "${var.environment}"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
@@ -122,8 +122,8 @@ resource "aws_subnet" "internal" {
   count             = "${length(var.internal_subnets)}"
 
   tags {
-    Name        = "${var.name}-${format("internal-%03d", count.index+1)}"
-    Environment = "${var.environment}"
+    Name                                        = "${var.name}-${format("internal-%03d", count.index+1)}"
+    Environment                                 = "${var.environment}"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
@@ -136,8 +136,8 @@ resource "aws_subnet" "external" {
   map_public_ip_on_launch = true
 
   tags {
-    Name        = "${var.name}-${format("external-%03d", count.index+1)}"
-    Environment = "${var.environment}"
+    Name                                        = "${var.name}-${format("external-%03d", count.index+1)}"
+    Environment                                 = "${var.environment}"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
   }
 }
@@ -178,7 +178,6 @@ resource "aws_route" "internal" {
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = "${element(aws_nat_gateway.main.*.id, count.index)}"
 }
-
 
 /**
  * Route associations
