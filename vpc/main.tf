@@ -74,11 +74,13 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags {
-    Name                                        = "${var.name}"
-    Environment                                 = "${var.environment}"
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-  }
+  tags = "${
+   map(
+    "Name", "${format("%s cluster", var.name)}",
+    "Environment", "${var.environment}",
+    "kubernetes.io/cluster/${var.cluster_name}", "shared"
+   )
+ }"
 }
 
 /**
@@ -121,11 +123,13 @@ resource "aws_subnet" "internal" {
   availability_zone = "${element(var.availability_zones, count.index)}"
   count             = "${length(var.internal_subnets)}"
 
-  tags {
-    Name                                        = "${var.name}-${format("internal-%03d", count.index+1)}"
-    Environment                                 = "${var.environment}"
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-  }
+  tags = "${
+   map(
+    "Name", "${var.name}-${format("internal-%03d", count.index+1)}",
+    "Environment", "${var.environment}",
+    "kubernetes.io/cluster/${var.cluster_name}", "shared"
+   )
+ }"
 }
 
 resource "aws_subnet" "external" {
@@ -135,11 +139,13 @@ resource "aws_subnet" "external" {
   count                   = "${length(var.external_subnets)}"
   map_public_ip_on_launch = true
 
-  tags {
-    Name                                        = "${var.name}-${format("external-%03d", count.index+1)}"
-    Environment                                 = "${var.environment}"
-    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-  }
+  tags = "${
+   map(
+    "Name", "${var.name}-${format("external-%03d", count.index+1)}",
+    "Environment", "${var.environment}",
+    "kubernetes.io/cluster/${var.cluster_name}", "shared"
+   )
+ }"
 }
 
 /**

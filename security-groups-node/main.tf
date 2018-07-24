@@ -42,11 +42,13 @@ resource "aws_security_group" "node" {
     create_before_destroy = true
   }
 
-  tags {
-    Name                                        = "${format("%s cluster", var.name)}"
-    Environment                                 = "${var.environment}"
-    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
-  }
+  tags = "${
+    map(
+     "Name", "${format("%s cluster", var.name)}",
+     "Environment", "${var.environment}",
+     "kubernetes.io/cluster/${var.cluster_name}", "owned"
+    )
+  }"
 }
 
 resource "aws_security_group_rule" "cluster_node_self_ingress" {
