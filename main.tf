@@ -170,7 +170,7 @@ module "iam_role_node" {
   source      = "iam-role-node"
   name        = "${var.name}"
   environment = "${var.environment}"
-  zone_id     = "${var.zone_arns}"
+  zone_arns   = "${var.zone_arns}"
 }
 
 module "eks_cluster" {
