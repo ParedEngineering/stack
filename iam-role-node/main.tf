@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "external_dns_policy" {
     ]
 
     resources = [
-      "${var.zone_arns}",
+      "*",
     ]
   }
 }
