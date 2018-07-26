@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "external_dns_policy" {
 }
 
 resource "aws_iam_role_policy" "external_dns_policy" {
-  policy = "${data.aws_iam_policy_document.external_dns_policy}"
+  policy = "${data.aws_iam_policy_document.external_dns_policy.json}"
   role   = "${aws_iam_role.default_eks_node_role.id}"
 }
 
