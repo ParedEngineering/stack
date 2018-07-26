@@ -36,29 +36,28 @@ data "aws_iam_policy_document" "external_dns_policy" {
   statement {
     actions = [
       "route53:ListHostedZones",
-      "route53:ListResourceRecordSets"
+      "route53:ListResourceRecordSets",
     ]
 
     resources = [
-      "${var.zone_id}"
+      "${var.zone_id}",
     ]
   }
 
   statement {
     actions = [
-      "route53:ChangeResourceRecordSets"
+      "route53:ChangeResourceRecordSets",
     ]
 
     resources = [
-      "${var.zone_id}"
+      "${var.zone_id}",
     ]
-
   }
 }
 
 resource "aws_iam_role_policy" "external_dns_policy" {
   policy = "${data.aws_iam_policy_document.external_dns_policy}"
-  role = "${aws_iam_role.default_eks_node_role.id}"
+  role   = "${aws_iam_role.default_eks_node_role.id}"
 }
 
 resource "aws_iam_role_policy_attachment" "eks_node_AmazonEKSWorkerNodePolicy" {
