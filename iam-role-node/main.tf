@@ -6,8 +6,9 @@ variable "environment" {
   description = "The name of the environment for this stack"
 }
 
-variable "zone_id" {
+variable "zone_arns" {
   description = "The arn of the hosted zone the cluster can modify"
+  type        = "list"
 }
 
 resource "aws_iam_role" "default_eks_node_role" {
@@ -40,7 +41,7 @@ data "aws_iam_policy_document" "external_dns_policy" {
     ]
 
     resources = [
-      "${var.zone_id}",
+      "*",
     ]
   }
 
@@ -50,7 +51,7 @@ data "aws_iam_policy_document" "external_dns_policy" {
     ]
 
     resources = [
-      "${var.zone_id}",
+      "${var.zone_arns}",
     ]
   }
 }
