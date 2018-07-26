@@ -120,6 +120,10 @@ variable "logs_expiration_days" {
   default = 30
 }
 
+variable "zone_id" {
+  description = "Zone id of the hosted zone where this cluster manages DNS entries"
+}
+
 module "defaults" {
   source = "./defaults"
   region = "${var.region}"
@@ -165,6 +169,7 @@ module "iam_role_node" {
   source      = "iam-role-node"
   name        = "${var.name}"
   environment = "${var.environment}"
+  zone_id = "${var.zone_id}"
 }
 
 module "eks_cluster" {
