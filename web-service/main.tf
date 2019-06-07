@@ -139,18 +139,18 @@ variable "deployment_maximum_percent" {
  */
 
 resource "aws_ecs_service" "main" {
-  name                               = "${module.task.name}"
-  cluster                            = "${var.cluster}"
-  task_definition                    = "${module.task.arn}"
-  desired_count                      = "${var.desired_count}"
-  iam_role                           = "${var.iam_role}"
-  deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
-  deployment_maximum_percent         = "${var.deployment_maximum_percent}"
+  name                               = module.task.name
+  cluster                            = var.cluster
+  task_definition                    = module.task.arn
+  desired_count                      = var.desired_count
+  iam_role                           = var.iam_role
+  deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
+  deployment_maximum_percent         = var.deployment_maximum_percent
 
   load_balancer {
-    elb_name       = "${module.elb.id}"
-    container_name = "${module.task.name}"
-    container_port = "${var.container_port}"
+    elb_name       = module.elb.id
+    container_name = module.task.name
+    container_port = var.container_port
   }
 
   lifecycle {
@@ -161,14 +161,14 @@ resource "aws_ecs_service" "main" {
 module "task" {
   source = "../task"
 
-  name          = "${coalesce(var.name, replace(var.image, "/", "-"))}"
-  image         = "${var.image}"
-  image_version = "${var.image_version}"
-  command       = "${var.command}"
-  env_vars      = "${var.env_vars}"
-  memory        = "${var.memory}"
-  cpu           = "${var.cpu}"
-  role          = "${var.iam_task_role}"
+  name          = coalesce(var.name, replace(var.image, "/", "-"))
+  image         = var.image
+  image_version = var.image_version
+  command       = var.command
+  env_vars      = var.env_vars
+  memory        = var.memory
+  cpu           = var.cpu
+  role          = var.iam_task_role
 
   ports = <<EOF
   [
@@ -183,18 +183,18 @@ EOF
 module "elb" {
   source = "./elb"
 
-  name               = "${module.task.name}"
-  port               = "${var.port}"
-  environment        = "${var.environment}"
-  subnet_ids         = "${var.subnet_ids}"
-  external_dns_name  = "${coalesce(var.external_dns_name, module.task.name)}"
-  internal_dns_name  = "${coalesce(var.internal_dns_name, module.task.name)}"
-  healthcheck        = "${var.healthcheck}"
-  external_zone_id   = "${var.external_zone_id}"
-  internal_zone_id   = "${var.internal_zone_id}"
-  security_groups    = "${var.security_groups}"
-  log_bucket         = "${var.log_bucket}"
-  ssl_certificate_id = "${var.ssl_certificate_id}"
+  name               = module.task.name
+  port               = var.port
+  environment        = var.environment
+  subnet_ids         = var.subnet_ids
+  external_dns_name  = coalesce(var.external_dns_name, module.task.name)
+  internal_dns_name  = coalesce(var.internal_dns_name, module.task.name)
+  healthcheck        = var.healthcheck
+  external_zone_id   = var.external_zone_id
+  internal_zone_id   = var.internal_zone_id
+  security_groups    = var.security_groups
+  log_bucket         = var.log_bucket
+  ssl_certificate_id = var.ssl_certificate_id
 }
 
 /**
@@ -203,30 +203,30 @@ module "elb" {
 
 // The name of the ELB
 output "name" {
-  value = "${module.elb.name}"
+  value = module.elb.name
 }
 
 // The DNS name of the ELB
 output "dns" {
-  value = "${module.elb.dns}"
+  value = module.elb.dns
 }
 
 // The id of the ELB
 output "elb" {
-  value = "${module.elb.id}"
+  value = module.elb.id
 }
 
 // The zone id of the ELB
 output "zone_id" {
-  value = "${module.elb.zone_id}"
+  value = module.elb.zone_id
 }
 
 // FQDN built using the zone domain and name (external)
 output "external_fqdn" {
-  value = "${module.elb.external_fqdn}"
+  value = module.elb.external_fqdn
 }
 
 // FQDN built using the zone domain and name (internal)
 output "internal_fqdn" {
-  value = "${module.elb.internal_fqdn}"
+  value = module.elb.internal_fqdn
 }

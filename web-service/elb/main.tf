@@ -55,12 +55,12 @@ variable "ssl_certificate_id" {}
  */
 
 resource "aws_elb" "main" {
-  name = "${var.name}"
+  name = var.name
 
   internal                  = false
   cross_zone_load_balancing = true
-  subnets                   = ["${split(",", var.subnet_ids)}"]
-  security_groups           = ["${split(",",var.security_groups)}"]
+  subnets                   = [split(",", var.subnet_ids)]
+  security_groups           = [split(",",var.security_groups)]
 
   idle_timeout                = 30
   connection_draining         = true
@@ -69,16 +69,16 @@ resource "aws_elb" "main" {
   listener {
     lb_port           = 80
     lb_protocol       = "http"
-    instance_port     = "${var.port}"
+    instance_port     = var.port
     instance_protocol = "http"
   }
 
   listener {
     lb_port            = 443
     lb_protocol        = "https"
-    instance_port      = "${var.port}"
+    instance_port      = var.port
     instance_protocol  = "http"
-    ssl_certificate_id = "${var.ssl_certificate_id}"
+    ssl_certificate_id = var.ssl_certificate_id
   }
 
   health_check {
@@ -90,36 +90,36 @@ resource "aws_elb" "main" {
   }
 
   access_logs {
-    bucket = "${var.log_bucket}"
+    bucket = var.log_bucket
   }
 
   tags {
     Name        = "${var.name}-balancer"
-    Service     = "${var.name}"
-    Environment = "${var.environment}"
+    Service     = var.name
+    Environment = var.environment
   }
 }
 
 resource "aws_route53_record" "external" {
-  zone_id = "${var.external_zone_id}"
-  name    = "${var.external_dns_name}"
+  zone_id = var.external_zone_id
+  name    = var.external_dns_name
   type    = "A"
 
   alias {
-    zone_id                = "${aws_elb.main.zone_id}"
-    name                   = "${aws_elb.main.dns_name}"
+    zone_id                = aws_elb.main.zone_id
+    name                   = aws_elb.main.dns_name
     evaluate_target_health = false
   }
 }
 
 resource "aws_route53_record" "internal" {
-  zone_id = "${var.internal_zone_id}"
-  name    = "${var.internal_dns_name}"
+  zone_id = var.internal_zone_id
+  name    = var.internal_dns_name
   type    = "A"
 
   alias {
-    zone_id                = "${aws_elb.main.zone_id}"
-    name                   = "${aws_elb.main.dns_name}"
+    zone_id                = aws_elb.main.zone_id
+    name                   = aws_elb.main.dns_name
     evaluate_target_health = false
   }
 }
@@ -130,30 +130,30 @@ resource "aws_route53_record" "internal" {
 
 // The ELB name.
 output "name" {
-  value = "${aws_elb.main.name}"
+  value = aws_elb.main.name
 }
 
 // The ELB ID.
 output "id" {
-  value = "${aws_elb.main.id}"
+  value = aws_elb.main.id
 }
 
 // The ELB dns_name.
 output "dns" {
-  value = "${aws_elb.main.dns_name}"
+  value = aws_elb.main.dns_name
 }
 
 // FQDN built using the zone domain and name (external)
 output "external_fqdn" {
-  value = "${aws_route53_record.external.fqdn}"
+  value = aws_route53_record.external.fqdn
 }
 
 // FQDN built using the zone domain and name (internal)
 output "internal_fqdn" {
-  value = "${aws_route53_record.internal.fqdn}"
+  value = aws_route53_record.internal.fqdn
 }
 
 // The zone id of the ELB
 output "zone_id" {
-  value = "${aws_elb.main.zone_id}"
+  value = aws_elb.main.zone_id
 }

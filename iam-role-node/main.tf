@@ -57,39 +57,39 @@ data "aws_iam_policy_document" "external_dns_policy" {
 }
 
 resource "aws_iam_role_policy" "external_dns_policy" {
-  policy = "${data.aws_iam_policy_document.external_dns_policy.json}"
-  role   = "${aws_iam_role.default_eks_node_role.id}"
+  policy = data.aws_iam_policy_document.external_dns_policy.json
+  role   = aws_iam_role.default_eks_node_role.id
 }
 
 resource "aws_iam_role_policy_attachment" "eks_node_AmazonEKSWorkerNodePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = "${aws_iam_role.default_eks_node_role.name}"
+  role       = aws_iam_role.default_eks_node_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "eks_node_AmazonEKS_CNI_Policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = "${aws_iam_role.default_eks_node_role.name}"
+  role       = aws_iam_role.default_eks_node_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "eks_node_AmazonEC2ContainerRegistryReadOnly" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = "${aws_iam_role.default_eks_node_role.name}"
+  role       = aws_iam_role.default_eks_node_role.name
 }
 
 resource "aws_iam_instance_profile" "eks_node" {
   name = "eks-instance-profile-${var.name}-${var.environment}"
   path = "/"
-  role = "${aws_iam_role.default_eks_node_role.name}"
+  role = aws_iam_role.default_eks_node_role.name
 }
 
 output "default_eks_node_role_id" {
-  value = "${aws_iam_role.default_eks_node_role.id}"
+  value = aws_iam_role.default_eks_node_role.id
 }
 
 output "arn" {
-  value = "${aws_iam_role.default_eks_node_role.arn}"
+  value = aws_iam_role.default_eks_node_role.arn
 }
 
 output "profile" {
-  value = "${aws_iam_instance_profile.eks_node.id}"
+  value = aws_iam_instance_profile.eks_node.id
 }

@@ -80,44 +80,44 @@ variable "root_volume_size" {
 }
 
 resource "aws_eks_cluster" "main" {
-  name     = "${var.name}"
-  role_arn = "${var.cluster_role_arn}"
+  name     = var.name
+  role_arn = var.cluster_role_arn
 
   vpc_config {
-    security_group_ids = ["${var.security_groups}"]
-    subnet_ids         = ["${var.subnet_ids}"]
+    security_group_ids = [var.security_groups]
+    subnet_ids         = [var.subnet_ids]
   }
 }
 
 data "template_file" "eks_cloud_config" {
-  template = "${file("${path.module}/files/userdata.tpl")}"
+  template = file("${path.module}/files/userdata.tpl")
 
   vars {
-    environment                   = "${var.environment}"
-    name                          = "${var.name}"
-    region                        = "${var.region}"
-    endpoint                      = "${aws_eks_cluster.main.endpoint}"
-    cluster_name                  = "${aws_eks_cluster.main.name}"
-    cluster_certificate_authority = "${aws_eks_cluster.main.certificate_authority.0.data}"
+    environment                   = var.environment
+    name                          = var.name
+    region                        = var.region
+    endpoint                      = aws_eks_cluster.main.endpoint
+    cluster_name                  = aws_eks_cluster.main.name
+    cluster_certificate_authority = aws_eks_cluster.main.certificate_authority[0].data
   }
 }
 
 resource "aws_launch_configuration" "main" {
-  name_prefix = "${format("%s-", var.name)}"
+  name_prefix = format("%s-", var.name)
 
-  image_id                    = "${var.image_id}"
-  instance_type               = "${var.instance_type}"
-  ebs_optimized               = "${var.instance_ebs_optimized}"
-  iam_instance_profile        = "${var.iam_instance_profile}"
-  security_groups             = ["${var.node_security_group_id}"]
-  user_data                   = "${data.template_file.eks_cloud_config.rendered}"
-  associate_public_ip_address = "${var.associate_public_ip_address}"
-  key_name                    = "${var.key_name}"
+  image_id                    = var.image_id
+  instance_type               = var.instance_type
+  ebs_optimized               = var.instance_ebs_optimized
+  iam_instance_profile        = var.iam_instance_profile
+  security_groups             = [var.node_security_group_id]
+  user_data                   = data.template_file.eks_cloud_config.rendered
+  associate_public_ip_address = var.associate_public_ip_address
+  key_name                    = var.key_name
 
   # root
   root_block_device {
     volume_type = "gp2"
-    volume_size = "${var.root_volume_size}"
+    volume_size = var.root_volume_size
   }
 
   lifecycle {
@@ -126,31 +126,31 @@ resource "aws_launch_configuration" "main" {
 }
 
 resource "aws_autoscaling_group" "main" {
-  name_prefix = "${var.name}"
+  name_prefix = var.name
 
-  availability_zones   = ["${var.availability_zones}"]
-  vpc_zone_identifier  = ["${var.subnet_ids}"]
-  launch_configuration = "${aws_launch_configuration.main.id}"
-  min_size             = "${var.min_size}"
-  max_size             = "${var.max_size}"
-  desired_capacity     = "${var.desired_capacity}"
+  availability_zones   = [var.availability_zones]
+  vpc_zone_identifier  = [var.subnet_ids]
+  launch_configuration = aws_launch_configuration.main.id
+  min_size             = var.min_size
+  max_size             = var.max_size
+  desired_capacity     = var.desired_capacity
   termination_policies = ["OldestLaunchConfiguration", "Default"]
 
   tag {
     key                 = "Name"
-    value               = "${var.name}"
+    value               = var.name
     propagate_at_launch = true
   }
 
   tag {
     key                 = "Cluster"
-    value               = "${var.name}"
+    value               = var.name
     propagate_at_launch = true
   }
 
   tag {
     key                 = "Environment"
-    value               = "${var.environment}"
+    value               = var.environment
     propagate_at_launch = true
   }
 
@@ -166,13 +166,13 @@ resource "aws_autoscaling_group" "main" {
 }
 
 output "endpoint" {
-  value = "${aws_eks_cluster.main.endpoint}"
+  value = aws_eks_cluster.main.endpoint
 }
 
 output "kubeconfig-certificate-authority-data" {
-  value = "${aws_eks_cluster.main.certificate_authority.0.data}"
+  value = aws_eks_cluster.main.certificate_authority[0].data
 }
 
 output "name" {
-  value = "${aws_eks_cluster.main.name}"
+  value = aws_eks_cluster.main.name
 }

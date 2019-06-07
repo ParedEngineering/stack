@@ -1,5 +1,6 @@
 example/keys
-.terraform
+**/.terraform/*
+**/OLD.terraform/**
 *.tfstate
 *.tfstate*
 *.swp

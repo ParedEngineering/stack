@@ -44,13 +44,13 @@ variable "default_log_account_ids" {
 }
 
 output "domain_name_servers" {
-  value = "${cidrhost(var.cidr, 2)}"
+  value = cidrhost(var.cidr, 2)
 }
 
 output "eks_ami" {
-  value = "${lookup(var.default_eks_ami, var.region)}"
+  value = lookup(var.default_eks_ami, var.region)
 }
 
 output "s3_logs_account_id" {
-  value = "${lookup(var.default_log_account_ids, var.region)}"
+  value = lookup(var.default_log_account_ids, var.region)
 }

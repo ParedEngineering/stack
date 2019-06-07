@@ -25,7 +25,7 @@ variable "policy" {
  */
 
 resource "aws_iam_user" "main" {
-  name = "${var.name}"
+  name = var.name
 
   lifecycle {
     create_before_destroy = true
@@ -37,7 +37,7 @@ resource "aws_iam_user" "main" {
  */
 
 resource "aws_iam_access_key" "main" {
-  user = "${aws_iam_user.main.name}"
+  user = aws_iam_user.main.name
 
   lifecycle {
     create_before_destroy = true
@@ -49,9 +49,9 @@ resource "aws_iam_access_key" "main" {
  */
 
 resource "aws_iam_user_policy" "main" {
-  name   = "${var.name}"
-  user   = "${aws_iam_user.main.name}"
-  policy = "${var.policy}"
+  name   = var.name
+  user   = aws_iam_user.main.name
+  policy = var.policy
 
   lifecycle {
     create_before_destroy = true
@@ -64,15 +64,15 @@ resource "aws_iam_user_policy" "main" {
 
 // The aws access key id.
 output "access_key" {
-  value = "${aws_iam_access_key.main.id}"
+  value = aws_iam_access_key.main.id
 }
 
 // The aws secret access key.
 output "secret_key" {
-  value = "${aws_iam_access_key.main.secret}"
+  value = aws_iam_access_key.main.secret
 }
 
 // The user ARN
 output "arn" {
-  value = "${aws_iam_user.main.arn}"
+  value = aws_iam_user.main.arn
 }

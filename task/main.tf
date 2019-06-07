@@ -79,8 +79,8 @@ variable "role" {
 # The ECS task definition.
 
 resource "aws_ecs_task_definition" "main" {
-  family        = "${var.name}"
-  task_role_arn = "${var.role}"
+  family        = var.name
+  task_role_arn = var.role
 
   lifecycle {
     ignore_changes        = ["image"]
@@ -117,15 +117,15 @@ EOF
 
 // The created task definition name
 output "name" {
-  value = "${aws_ecs_task_definition.main.family}"
+  value = aws_ecs_task_definition.main.family
 }
 
 // The created task definition ARN
 output "arn" {
-  value = "${aws_ecs_task_definition.main.arn}"
+  value = aws_ecs_task_definition.main.arn
 }
 
 // The revision number of the task definition
 output "revision" {
-  value = "${aws_ecs_task_definition.main.revision}"
+  value = aws_ecs_task_definition.main.revision
 }

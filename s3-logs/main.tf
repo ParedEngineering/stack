@@ -13,11 +13,11 @@ variable "logs_expiration_days" {
 }
 
 data "template_file" "policy" {
-  template = "${file("${path.module}/policy.json")}"
+  template = file("${path.module}/policy.json")
 
   vars = {
     bucket     = "${var.name}-${var.environment}-logs"
-    account_id = "${var.account_id}"
+    account_id = var.account_id
   }
 }
 
@@ -27,21 +27,21 @@ resource "aws_s3_bucket" "logs" {
   lifecycle_rule {
     id      = "logs-expiration"
     prefix  = ""
-    enabled = "${var.logs_expiration_enabled}"
+    enabled = var.logs_expiration_enabled
 
     expiration {
-      days = "${var.logs_expiration_days}"
+      days = var.logs_expiration_days
     }
   }
 
   tags {
     Name        = "${var.name}-${var.environment}-logs"
-    Environment = "${var.environment}"
+    Environment = var.environment
   }
 
-  policy = "${data.template_file.policy.rendered}"
+  policy = data.template_file.policy.rendered
 }
 
 output "id" {
-  value = "${aws_s3_bucket.logs.id}"
+  value = aws_s3_bucket.logs.id
 }
